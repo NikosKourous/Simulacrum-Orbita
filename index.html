@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <!-- The viewport meta tag is essential for responsive design on mobile devices -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulacrum Orbita</title>
+  <style>
+    /* Style for the clickable telephone text */
+    #telephone {
+      color: blue;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    
+    /* Popover container styling */
+    #popover {
+      display: none; /* Hidden by default */
+      position: absolute;
+      background: #fff;
+      border: 1px solid #ccc;
+      padding: 0.0rem 0.5rem;
+      border-radius: 3px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      max-width: 250px;
+      z-index: 1000;
+    }
+    
+    /* Base styles for mobile-first design */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 1rem;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+    
+    main {
+      padding: 1rem 0;
+    }
+    
+    /* Example responsive navigation menu for mobile */
+    nav ul {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      justify-content: space-around;
+    }
+    
+    nav a {
+      color: #fff;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    
+    /* Media query for larger devices (e.g., tablets or laptops) */
+    @media (min-width: 600px) {
+      body {
+        max-width: 600px;
+        margin: 0 auto;
+      }
+    }
+    
+    /* --- Styles for the image grid --- */
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(256px, 1fr));
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    
+    .grid-item {
+      background: #fff;
+      padding: 0.5rem;
+      box-sizing: border-box;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      text-align: center;
+    }
+    
+    .grid-item img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    
+    /* Captions are hidden by default */
+    .caption {
+      display: none;
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+      color: #555;
+    }
+    
+    /* Toggle button styling */
+    #toggleCaptions {
+      display: block;
+      margin: 1rem auto;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1 style="margin-bottom: 0.2rem;">Simulacrum Orbita</h1>
+    <p style="font-size: 0.8rem; margin-top: 0.1rem"><i>Nikos Antonio Kourous-Vázquez</i></p>
+  </header>
+
+  <main>
+    <p>Simulacrum Orbita is a never-ending feedback loop between two generative machine learning (AI) models: one generates images, while the other describes them. Like the game “<span id="telephone">telephone</span>”, a message is passed along between them, becoming slowly distorted over time.</p>
+
+    <p>First, an image is generated using a prompt – such as ‘a dog running in a field’. This newly created image is then passed along to the machine learning program able to ‘see’ and describe images. Rather than accurately describing that image as ‘a dog running in a field’, however, this model might describe it as ‘a bear running in a forest’ instead. This new description is then used as the prompt for the next image, and so on.</p>
+    
+    <p>Overtime, random deviations, either in the generated images or in their generated descriptions, transform the content, nature, and trajectory of the image sequence. Upon each subsequent update, each monitor displays, from left to right, a new image created from the generated description of the image before it. Sometimes, the imagery shifts rapidly between different objects, people, and places as they struggle to communicate and understand one another. Other times, the models find themselves lost in forest paths or city streets, or in fields of grass.</p>
+    
+    <p>
+      Simulacrum Orbita is powered by the captioning machine learning model 
+      <a href="https://arxiv.org/abs/2201.12086" target="_blank" rel="noopener noreferrer">BLIP</a> 
+      and 
+      <a href="https://github.com/crowsonkb/v-diffusion-pytorch" target="_blank" rel="noopener noreferrer">CC12M V Objective Diffusion</a>.
+    </p>
+
+    <!-- Popover for the telephone text -->
+    <div id="popover">
+      <p>Also called 'broken telephone' or 'chinese whispers,' although this term connotes non-western language and culture to ideas of confusion and incomprehensibility.</p>
+    </div>
+
+    <!-- Toggle Captions Button -->
+    <button id="toggleCaptions">Show Captions</button>
+    
+    <!-- Image grid container -->
+    <div class="grid-container" id="imageGrid">
+      <!-- Grid items will be generated here from JSON -->
+    </div>
+  </main>
+
+  <script>
+    // --- Popover functionality for "telephone" ---
+    const telephone = document.getElementById('telephone');
+    const popover = document.getElementById('popover');
+
+    telephone.addEventListener('click', (e) => {
+      const rect = telephone.getBoundingClientRect();
+      popover.style.top = (rect.bottom + window.scrollY) + 'px';
+      popover.style.left = (rect.left + window.scrollX) + 'px';
+      popover.style.display = 'block';
+      e.stopPropagation();
+    });
+
+    document.addEventListener('click', (event) => {
+      if (!popover.contains(event.target) && event.target !== telephone) {
+        popover.style.display = 'none';
+      }
+    });
+
+    // --- Image Grid with Toggleable Captions ---
+    // Function to create a grid item element
+    function createGridItem(imageData) {
+      const gridItem = document.createElement('div');
+      gridItem.className = 'grid-item';
+      
+      const img = document.createElement('img');
+      // If your JSON file paths are absolute Windows paths,
+      // update them to relative URLs. For example, you might extract just the filename:
+      // const filename = imageData.filename.split('\\').pop();
+      // and then set: img.src = 'embedded/' + filename;
+      // For this example, we'll assume the JSON now contains relative paths.
+      img.src = imageData.filename;
+      img.alt = imageData.filename.split('\\').pop().split('/').pop();
+      
+      const captionDiv = document.createElement('div');
+      captionDiv.className = 'caption';
+      captionDiv.textContent = imageData.caption;
+      
+      gridItem.appendChild(img);
+      gridItem.appendChild(captionDiv);
+      
+      return gridItem;
+    }
+    
+    // Fetch the JSON file with image data
+    fetch('image_captions.json')
+  .then(response => response.json())
+  .then(data => {
+    // Sort the array numerically based on the number in the filename
+    data.sort((a, b) => {
+      // Extract the number using a regular expression.
+      // Adjust the regex if your naming pattern is different.
+      const regex = /duo(\d+)\.png$/;
+      const matchA = a.filename.match(regex);
+      const matchB = b.filename.match(regex);
+      
+      // If both filenames match, compare the numbers
+      if (matchA && matchB) {
+        const numA = parseInt(matchA[1], 10);
+        const numB = parseInt(matchB[1], 10);
+        return numA - numB;
+      }
+      // Fallback to string comparison if regex fails for some reason
+      return a.filename.localeCompare(b.filename);
+    });
+    
+    const gridContainer = document.getElementById('imageGrid');
+    data.forEach(imageData => {
+      const gridItem = createGridItem(imageData);
+      gridContainer.appendChild(gridItem);
+    });
+  })
+  .catch(error => console.error('Error loading images:', error));
+
+    // Toggle captions functionality
+    const toggleButton = document.getElementById('toggleCaptions');
+    let captionsVisible = false;
+    toggleButton.addEventListener('click', () => {
+      captionsVisible = !captionsVisible;
+      document.querySelectorAll('.caption').forEach(caption => {
+        caption.style.display = captionsVisible ? 'block' : 'none';
+      });
+      toggleButton.textContent = captionsVisible ? 'Hide Captions' : 'Show Captions';
+    });
+  </script>
+
+  <footer>
+    <p>&copy; 2025 Nikos Antonio Kourous-Vázquez</p>
+  </footer>
+</body>
+</html>
