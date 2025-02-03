@@ -84,45 +84,24 @@
       display: block;
     }
     
-    /* Captions are hidden by default */
+    /* Captions are now visible by default */
     .caption {
-      display: none;
+      display: block;
       margin-top: 0.5rem;
       font-size: 0.7rem;
       color: #555;
     }
     
-    /* --- Toggle Captions Button --- */
-    /* Initially, let the button be in the document flow (static) */
-    #toggleCaptions {
-      padding: 0.3rem 0.5rem;
-      font-size: 0.8rem;
-      cursor: pointer;
-      z-index: 2000;
-      transition: all 0.8s ease;
-    }
-    
     /* --- Scroll to Top Button --- */
     #scrollToTop {
       position: fixed;
-      top: 1rem;
-      right: 1rem;
-      /*bottom: 3rem;  /* Adjust as needed so it doesn't overlap the toggle button */
-      /*left: 1rem;
+      top: 1rem;           /* Adjust as needed */
+      right: 1rem;         /* Adjust as needed */
       padding: 0.3rem 0.5rem;
       font-size: 0.8rem;
       cursor: pointer;
-      display: none; /* Hidden initially */
+      display: none;       /* Hidden initially */
       z-index: 2000;
-    }
-    
-    /* When the captions button becomes fixed, style it for bottom-left position */
-    .fixedButton {
-      position: fixed;
-      top: 2.7rem;
-      right: 1rem;
-      /*bottom: 0.5rem;
-      /*left: 1rem;
     }
   </style>
 </head>
@@ -152,6 +131,15 @@
       <a href="https://github.com/crowsonkb/v-diffusion-pytorch" target="_blank" rel="noopener noreferrer">CC12M V Objective Diffusion</a>.
     </p>
 
+    <p style="text-align: center;">_____________________________________________</p>
+    
+    <img src="diagram orbitis.png" alt="Diagram" style="display: block; margin: 1em 0; width: 600px; height: auto;">
+    
+    <br>
+    <header>
+      <h2><i>example run #317</i></h2>
+    </header>
+    
     <!-- Popover for the telephone text -->
     <div id="popover">
       <p>
@@ -159,10 +147,6 @@
       </p>
     </div>
 
-    <!-- Toggle Captions Button -->
-    <!-- Initially placed inline. It will be repositioned by JS when scrolling -->
-    <button id="toggleCaptions">Show Captions</button>
-    
     <!-- Image grid container -->
     <div class="grid-container" id="imageGrid">
       <!-- Grid items will be generated here from JSON -->
@@ -191,7 +175,7 @@
       }
     });
 
-    // --- Image Grid with Toggleable Captions ---
+    // --- Image Grid with Captions Visible by Default ---
     // Function to create a grid item element
     function createGridItem(imageData) {
       const gridItem = document.createElement('div');
@@ -237,31 +221,14 @@
       })
       .catch(error => console.error('Error loading images:', error));
 
-    // --- Toggle Captions functionality ---
-    const toggleButton = document.getElementById('toggleCaptions');
-    let captionsVisible = false;
-    toggleButton.addEventListener('click', () => {
-      captionsVisible = !captionsVisible;
-      document.querySelectorAll('.caption').forEach(caption => {
-        caption.style.display = captionsVisible ? 'block' : 'none';
-      });
-      toggleButton.textContent = captionsVisible ? 'Hide Captions' : 'Show Captions';
-    });
-
-    // --- Scroll Behavior for Button Position and "Scroll to Top" ---
+    // --- Scroll Behavior for "Scroll to Top" Button ---
     const scrollToTopButton = document.getElementById('scrollToTop');
-    const fixedThreshold = 200; // Adjust threshold (in pixels) for when the toggle button should become fixed
+    const fixedThreshold = 200; // Adjust threshold (in pixels) when the button appears
 
     window.addEventListener('scroll', () => {
       if (window.scrollY > fixedThreshold) {
-        // Make the toggle button fixed at the bottom left
-        toggleButton.classList.add('fixedButton');
-        // Show the scroll to top button
         scrollToTopButton.style.display = 'block';
       } else {
-        // Return the toggle button to its original inline position
-        toggleButton.classList.remove('fixedButton');
-        // Hide the scroll to top button when near the top
         scrollToTopButton.style.display = 'none';
       }
     });
