@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <!-- The viewport meta tag is essential for responsive design on mobile devices -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Simulacrum Orbita</title>
   <style>
     /* Style for the clickable telephone text */
@@ -88,22 +88,42 @@
     .caption {
       display: none;
       margin-top: 0.5rem;
-      font-size: 0.9rem;
+      font-size: 0.7rem;
       color: #555;
     }
     
-    /* Toggle button styling */
-/* Toggle button styling */
-  #toggleCaptions {
-    position: fixed;      /* Fix its position relative to the viewport */
-    bottom: 1rem;         /* Distance from the bottom of the viewport */
-    right: 1rem;          /* Distance from the right of the viewport */
-    padding: 0.3rem 0.5rem; /* Smaller padding */
-    font-size: 0.8rem;    /* Smaller font size */
-    cursor: pointer;
-    z-index: 2000;        /* Make sure it sits above other content */
-  }
-
+    /* --- Toggle Captions Button --- */
+    /* Initially, let the button be in the document flow (static) */
+    #toggleCaptions {
+      padding: 0.3rem 0.5rem;
+      font-size: 0.8rem;
+      cursor: pointer;
+      z-index: 2000;
+      transition: all 0.8s ease;
+    }
+    
+    /* --- Scroll to Top Button --- */
+    #scrollToTop {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      /*bottom: 3rem;  /* Adjust as needed so it doesn't overlap the toggle button */
+      /*left: 1rem;
+      padding: 0.3rem 0.5rem;
+      font-size: 0.8rem;
+      cursor: pointer;
+      display: none; /* Hidden initially */
+      z-index: 2000;
+    }
+    
+    /* When the captions button becomes fixed, style it for bottom-left position */
+    .fixedButton {
+      position: fixed;
+      top: 2.7rem;
+      right: 1rem;
+      /*bottom: 0.5rem;
+      /*left: 1rem;
+    }
   </style>
 </head>
 <body>
@@ -113,11 +133,17 @@
   </header>
 
   <main>
-    <p>Simulacrum Orbita is a never-ending feedback loop between two generative machine learning (AI) models: one generates images, while the other describes them. Like the game “<span id="telephone">telephone</span>”, a message is passed along between them, becoming slowly distorted over time.</p>
+    <p>
+      Simulacrum Orbita is a never-ending feedback loop between two generative machine learning (AI) models: one generates images, while the other describes them. Like the game “<span id="telephone">telephone</span>”, a message is passed along between them, becoming slowly distorted over time.
+    </p>
 
-    <p>First, an image is generated using a prompt – such as ‘a dog running in a field’. This newly created image is then passed along to the machine learning program able to ‘see’ and describe images. Rather than accurately describing that image as ‘a dog running in a field’, however, this model might describe it as ‘a bear running in a forest’ instead. This new description is then used as the prompt for the next image, and so on.</p>
+    <p>
+      First, an image is generated using a prompt – such as ‘a dog running in a field’. This newly created image is then passed along to the machine learning program able to ‘see’ and describe images. Rather than accurately describing that image as ‘a dog running in a field’, however, this model might describe it as ‘a bear running in a forest’ instead. This new description is then used as the prompt for the next image, and so on.
+    </p>
     
-    <p>Overtime, random deviations, either in the generated images or in their generated descriptions, transform the content, nature, and trajectory of the image sequence. Upon each subsequent update, each monitor displays, from left to right, a new image created from the generated description of the image before it. Sometimes, the imagery shifts rapidly between different objects, people, and places as they struggle to communicate and understand one another. Other times, the models find themselves lost in forest paths or city streets, or in fields of grass.</p>
+    <p>
+      Overtime, random deviations, either in the generated images or in their generated descriptions, transform the content, nature, and trajectory of the image sequence. Upon each subsequent update, each monitor displays, from left to right, a new image created from the generated description of the image before it. Sometimes, the imagery shifts rapidly between different objects, people, and places as they struggle to communicate and understand one another. Other times, the models find themselves lost in forest paths or city streets, or in fields of grass.
+    </p>
     
     <p>
       Simulacrum Orbita is powered by the captioning machine learning model 
@@ -128,10 +154,13 @@
 
     <!-- Popover for the telephone text -->
     <div id="popover">
-      <p>Also called 'broken telephone' or 'chinese whispers,' although this term connotes non-western language and culture to ideas of confusion and incomprehensibility.</p>
+      <p>
+        Also called 'broken telephone' or 'chinese whispers,' although this term connotes non-western language and culture to ideas of confusion and incomprehensibility.
+      </p>
     </div>
 
     <!-- Toggle Captions Button -->
+    <!-- Initially placed inline. It will be repositioned by JS when scrolling -->
     <button id="toggleCaptions">Show Captions</button>
     
     <!-- Image grid container -->
@@ -139,6 +168,9 @@
       <!-- Grid items will be generated here from JSON -->
     </div>
   </main>
+
+  <!-- Scroll To Top Button -->
+  <button id="scrollToTop">Top</button>
 
   <script>
     // --- Popover functionality for "telephone" ---
@@ -166,11 +198,7 @@
       gridItem.className = 'grid-item';
       
       const img = document.createElement('img');
-      // If your JSON file paths are absolute Windows paths,
-      // update them to relative URLs. For example, you might extract just the filename:
-      // const filename = imageData.filename.split('\\').pop();
-      // and then set: img.src = 'embedded/' + filename;
-      // For this example, we'll assume the JSON now contains relative paths.
+      // Assuming the JSON now contains relative paths.
       img.src = imageData.filename;
       img.alt = imageData.filename.split('\\').pop().split('/').pop();
       
@@ -186,35 +214,30 @@
     
     // Fetch the JSON file with image data
     fetch('image_captions.json')
-  .then(response => response.json())
-  .then(data => {
-    // Sort the array numerically based on the number in the filename
-    data.sort((a, b) => {
-      // Extract the number using a regular expression.
-      // Adjust the regex if your naming pattern is different.
-      const regex = /duo(\d+)\.png$/;
-      const matchA = a.filename.match(regex);
-      const matchB = b.filename.match(regex);
-      
-      // If both filenames match, compare the numbers
-      if (matchA && matchB) {
-        const numA = parseInt(matchA[1], 10);
-        const numB = parseInt(matchB[1], 10);
-        return numA - numB;
-      }
-      // Fallback to string comparison if regex fails for some reason
-      return a.filename.localeCompare(b.filename);
-    });
-    
-    const gridContainer = document.getElementById('imageGrid');
-    data.forEach(imageData => {
-      const gridItem = createGridItem(imageData);
-      gridContainer.appendChild(gridItem);
-    });
-  })
-  .catch(error => console.error('Error loading images:', error));
+      .then(response => response.json())
+      .then(data => {
+        // Sort the array numerically based on the number in the filename
+        data.sort((a, b) => {
+          const regex = /duo(\d+)\.png$/;
+          const matchA = a.filename.match(regex);
+          const matchB = b.filename.match(regex);
+          if (matchA && matchB) {
+            const numA = parseInt(matchA[1], 10);
+            const numB = parseInt(matchB[1], 10);
+            return numA - numB;
+          }
+          return a.filename.localeCompare(b.filename);
+        });
+        
+        const gridContainer = document.getElementById('imageGrid');
+        data.forEach(imageData => {
+          const gridItem = createGridItem(imageData);
+          gridContainer.appendChild(gridItem);
+        });
+      })
+      .catch(error => console.error('Error loading images:', error));
 
-    // Toggle captions functionality
+    // --- Toggle Captions functionality ---
     const toggleButton = document.getElementById('toggleCaptions');
     let captionsVisible = false;
     toggleButton.addEventListener('click', () => {
@@ -223,6 +246,32 @@
         caption.style.display = captionsVisible ? 'block' : 'none';
       });
       toggleButton.textContent = captionsVisible ? 'Hide Captions' : 'Show Captions';
+    });
+
+    // --- Scroll Behavior for Button Position and "Scroll to Top" ---
+    const scrollToTopButton = document.getElementById('scrollToTop');
+    const fixedThreshold = 200; // Adjust threshold (in pixels) for when the toggle button should become fixed
+
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > fixedThreshold) {
+        // Make the toggle button fixed at the bottom left
+        toggleButton.classList.add('fixedButton');
+        // Show the scroll to top button
+        scrollToTopButton.style.display = 'block';
+      } else {
+        // Return the toggle button to its original inline position
+        toggleButton.classList.remove('fixedButton');
+        // Hide the scroll to top button when near the top
+        scrollToTopButton.style.display = 'none';
+      }
+    });
+
+    // Scroll to top functionality
+    scrollToTopButton.addEventListener('click', () => {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
     });
   </script>
 
