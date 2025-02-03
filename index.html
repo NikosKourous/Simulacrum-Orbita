@@ -93,13 +93,17 @@
     }
     
     /* Toggle button styling */
-    #toggleCaptions {
-      display: block;
-      margin: 1rem auto;
-      padding: 0.5rem 1rem;
-      font-size: 1rem;
-      cursor: pointer;
-    }
+/* Toggle button styling */
+  #toggleCaptions {
+    position: fixed;      /* Fix its position relative to the viewport */
+    bottom: 1rem;         /* Distance from the bottom of the viewport */
+    right: 1rem;          /* Distance from the right of the viewport */
+    padding: 0.3rem 0.5rem; /* Smaller padding */
+    font-size: 0.8rem;    /* Smaller font size */
+    cursor: pointer;
+    z-index: 2000;        /* Make sure it sits above other content */
+  }
+
   </style>
 </head>
 <body>
