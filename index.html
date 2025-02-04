@@ -6,6 +6,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Simulacrum Orbita</title>
   <style>
+    :root {
+      /* Initially, set via JS */
+      --grid-item-min-size: 600px;
+    }
+    
     /* Style for the clickable telephone text */
     #telephone {
       color: blue;
@@ -33,13 +38,13 @@
       padding: 1rem;
       background-color: #f9f9f9;
       color: #333;
+      transition: padding 0.3s ease;
     }
     
     main {
       padding: 1rem 0;
     }
     
-    /* Example responsive navigation menu for mobile */
     nav ul {
       list-style: none;
       padding: 0;
@@ -53,7 +58,6 @@
       font-weight: bold;
     }
     
-    /* Media query for larger devices (e.g., tablets or laptops) */
     @media (min-width: 600px) {
       body {
         max-width: 600px;
@@ -64,9 +68,10 @@
     /* --- Styles for the image grid --- */
     .grid-container {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(256px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(var(--grid-item-min-size), 1fr));
       gap: 1rem;
       margin-top: 2rem;
+      transition: gap 0.3s ease;
     }
     
     .grid-item {
@@ -76,6 +81,7 @@
       border: 1px solid #ddd;
       border-radius: 4px;
       text-align: center;
+      transition: border 0.3s ease, padding 0.3s ease;
     }
     
     .grid-item img {
@@ -84,24 +90,56 @@
       display: block;
     }
     
-    /* Captions are now visible by default */
+    /* Captions are visible by default */
     .caption {
       display: block;
       margin-top: 0.5rem;
       font-size: 0.7rem;
       color: #555;
+      transition: display 0.3s ease;
     }
     
     /* --- Scroll to Top Button --- */
     #scrollToTop {
       position: fixed;
-      top: 1rem;           /* Adjust as needed */
-      right: 1rem;         /* Adjust as needed */
+      top: 1rem;
+      right: 41rem;
       padding: 0.3rem 0.5rem;
       font-size: 0.8rem;
       cursor: pointer;
-      display: none;       /* Hidden initially */
+      display: none;
       z-index: 2000;
+    }
+    
+    /* --- Zoom Controls Container --- */
+    #zoomControls {
+      position: fixed;
+      bottom: 1rem;
+      right: 41rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      z-index: 2000;
+    }
+    
+    #zoomControls button {
+      padding: 0.3rem 0.5rem;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+    
+    /* --- Styles for max zoom out --- */
+    body.maxZoomOut .grid-container {
+      gap: 0.2rem; /* Very small gap between images */
+    }
+    
+    body.maxZoomOut .grid-item {
+      border: none;
+      padding: 0;  /* Remove extra padding */
+    }
+    
+    body.maxZoomOut .caption {
+      display: none; /* Hide captions */
     }
   </style>
 </head>
@@ -133,12 +171,13 @@
 
     <p style="text-align: center;">_____________________________________________</p>
     
-    <img src="diagram orbitis.png" alt="Diagram" style="display: block; margin: 1em 0; width: 600px; height: auto;">
-    
+    <img src="orbitis diagram final.png" alt="Diagram" style="display: block; margin: 1em 0; width: 600px; height: auto;">
+
     <br>
     <header>
-      <h2><i>example run #317</i></h2>
+      <h2><i>example run </i></h2>
     </header>
+    <p>Below are the images from a one hour uninterrupted run. Zoom in to see the captions, or zoom out to see the overall evolution of imagery!</p>
     
     <!-- Popover for the telephone text -->
     <div id="popover">
@@ -155,6 +194,12 @@
 
   <!-- Scroll To Top Button -->
   <button id="scrollToTop">Top</button>
+
+  <!-- Zoom Controls -->
+  <div id="zoomControls">
+    <button id="zoomIn">zoom in!</button>
+    <button id="zoomOut">zoom out!</button>
+  </div>
 
   <script>
     // --- Popover functionality for "telephone" ---
@@ -176,13 +221,11 @@
     });
 
     // --- Image Grid with Captions Visible by Default ---
-    // Function to create a grid item element
     function createGridItem(imageData) {
       const gridItem = document.createElement('div');
       gridItem.className = 'grid-item';
       
       const img = document.createElement('img');
-      // Assuming the JSON now contains relative paths.
       img.src = imageData.filename;
       img.alt = imageData.filename.split('\\').pop().split('/').pop();
       
@@ -196,11 +239,9 @@
       return gridItem;
     }
     
-    // Fetch the JSON file with image data
     fetch('image_captions.json')
       .then(response => response.json())
       .then(data => {
-        // Sort the array numerically based on the number in the filename
         data.sort((a, b) => {
           const regex = /duo(\d+)\.png$/;
           const matchA = a.filename.match(regex);
@@ -223,23 +264,61 @@
 
     // --- Scroll Behavior for "Scroll to Top" Button ---
     const scrollToTopButton = document.getElementById('scrollToTop');
-    const fixedThreshold = 200; // Adjust threshold (in pixels) when the button appears
-
+    const fixedThreshold = 200;
     window.addEventListener('scroll', () => {
-      if (window.scrollY > fixedThreshold) {
-        scrollToTopButton.style.display = 'block';
-      } else {
-        scrollToTopButton.style.display = 'none';
-      }
+      scrollToTopButton.style.display = window.scrollY > fixedThreshold ? 'block' : 'none';
     });
-
-    // Scroll to top functionality
     scrollToTopButton.addEventListener('click', () => {
       window.scrollTo({
         top: 0,
         behavior: 'smooth'
       });
     });
+
+    // --- Zoom Controls ---
+    const zoomInButton = document.getElementById('zoomIn');
+    const zoomOutButton = document.getElementById('zoomOut');
+    
+    // Define four zoom levels:
+    // Level 0: 1 image per row (max zoom in) => 600px
+    // Level 1: ~3 images per row           => 200px
+    // Level 2: ~5 images per row           => 120px
+    // Level 3: ~9 images per row (max zoom out) => 66.67px
+    const zoomLevels = ["600px", "200px", "120px", "66.67px"];
+    // Start at maximum zoom out (level 3)
+    let currentZoomLevel = zoomLevels.length - 1;
+    
+    function updateGridZoom() {
+      document.documentElement.style.setProperty('--grid-item-min-size', zoomLevels[currentZoomLevel]);
+      
+      // Toggle the "maxZoomOut" class on body at level 3
+      if (currentZoomLevel === zoomLevels.length - 1) {
+        document.body.classList.add('maxZoomOut');
+      } else {
+        document.body.classList.remove('maxZoomOut');
+      }
+      
+      // Show/hide buttons accordingly
+      zoomOutButton.style.display = (currentZoomLevel === zoomLevels.length - 1) ? "none" : "block";
+      zoomInButton.style.display = (currentZoomLevel === 0) ? "none" : "block";
+    }
+    
+    zoomInButton.addEventListener('click', () => {
+      if (currentZoomLevel > 0) {
+        currentZoomLevel--;
+        updateGridZoom();
+      }
+    });
+    
+    zoomOutButton.addEventListener('click', () => {
+      if (currentZoomLevel < zoomLevels.length - 1) {
+        currentZoomLevel++;
+        updateGridZoom();
+      }
+    });
+    
+    // Initialize zoom level on page load
+    updateGridZoom();
   </script>
 
   <footer>
