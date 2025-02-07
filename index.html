@@ -7,8 +7,8 @@
   <title>Simulacrum Orbita</title>
   <style>
     :root {
-      /* Initially, set via JS */
-      --grid-item-min-size: 600px;
+      /* This CSS variable will be updated via JS */
+      --grid-item-min-size: 300px;
     }
     
     /* Style for the clickable telephone text */
@@ -68,6 +68,7 @@
     /* --- Styles for the image grid --- */
     .grid-container {
       display: grid;
+      /* The grid uses the CSS variable for the minimum width */
       grid-template-columns: repeat(auto-fit, minmax(var(--grid-item-min-size), 1fr));
       gap: 1rem;
       margin-top: 2rem;
@@ -128,7 +129,7 @@
       cursor: pointer;
     }
     
-    /* --- Styles for max zoom out --- */
+    /* --- Styles for max zoom out (Level 3) --- */
     body.maxZoomOut .grid-container {
       gap: 0.2rem; /* Very small gap between images */
     }
@@ -148,31 +149,31 @@
     <h1 style="margin-bottom: 0.2rem;">Simulacrum Orbita</h1>
     <p style="font-size: 0.8rem; margin-top: 0.1rem"><i>Nikos Antonio Kourous-Vázquez</i></p>
   </header>
-
   <main>
     <p>
       Simulacrum Orbita is a never-ending feedback loop between two generative machine learning (AI) models: one generates images, while the other describes them. Like the game “<span id="telephone">telephone</span>”, a message is passed along between them, becoming slowly distorted over time.
     </p>
-
-    <p>
-      First, an image is generated using a prompt – such as ‘a dog running in a field’. This newly created image is then passed along to the machine learning program able to ‘see’ and describe images. Rather than accurately describing that image as ‘a dog running in a field’, however, this model might describe it as ‘a bear running in a forest’ instead. This new description is then used as the prompt for the next image, and so on.
-    </p>
     
+    <p>
+      The loop begins with a generated image – such as ‘a red car’. This newly created image is passed along to the machine learning program able to ‘see’ and describe images. Rather than accurately describing that image as a 'red car’, however, this model might describe it as ‘a red building’ instead, perhaps because it mistook the car windows as those of a building. This new description is then used as the prompt for the next image, and so on. In this example, the red building might be described as a red mailbox, and then a fire hydrant, and then perhaps, a red sunset.
+    </p>
+  
     <p>
       Overtime, random deviations, either in the generated images or in their generated descriptions, transform the content, nature, and trajectory of the image sequence. Upon each subsequent update, each monitor displays, from left to right, a new image created from the generated description of the image before it. Sometimes, the imagery shifts rapidly between different objects, people, and places as they struggle to communicate and understand one another. Other times, the models find themselves lost in forest paths or city streets, or in fields of grass.
     </p>
-    
+  
     <p>
-      Simulacrum Orbita is powered by the captioning machine learning model 
-      <a href="https://arxiv.org/abs/2201.12086" target="_blank" rel="noopener noreferrer">BLIP</a> 
-      and 
-      <a href="https://github.com/crowsonkb/v-diffusion-pytorch" target="_blank" rel="noopener noreferrer">CC12M V Objective Diffusion</a>.
+      As I programmed the two models to work together, I imagined them as two innocent beings trapped in a dark room, struggling to understand each other and the world around them. One model effortlessly wields a paintbrush yet remains blind to the meaning of its own creations. The other has no paintbrush, no medium of its own, equipped solely with the ability to condense images into words, reducing the richness of vision into language and always falling short of capturing the full picture. Together, however, a new language is created as the models collaborate to create meaning of themselves and the world around them.
     </p>
-
+  
+    <p>
+      Simulacrum Orbita is powered by the captioning machine learning model <a href="https://arxiv.org/abs/2201.12086" target="_blank" rel="noopener noreferrer">BLIP</a> and <a href="https://github.com/crowsonkb/v-diffusion-pytorch" target="_blank" rel="noopener noreferrer">CC12M V Objective Diffusion</a>.
+    </p>
+  
     <p style="text-align: center;">_____________________________________________</p>
     
     <img src="orbitis diagram final.png" alt="Diagram" style="display: block; margin: 1em 0; width: 300px; height: auto;">
-
+  
     <br>
     <header>
       <h2><i>example run </i></h2>
@@ -185,12 +186,13 @@
         Also called 'broken telephone' or 'chinese whispers,' although this term connotes non-western language and culture to ideas of confusion and incomprehensibility.
       </p>
     </div>
-
+  
     <!-- Image grid container -->
     <div class="grid-container" id="imageGrid">
       <!-- Grid items will be generated here from JSON -->
     </div>
   </main>
+  
 
   <!-- Scroll To Top Button -->
   <button id="scrollToTop">Top</button>
@@ -280,25 +282,27 @@
     const zoomOutButton = document.getElementById('zoomOut');
     
     // Define four zoom levels:
-    // Level 0: 1 image per row (max zoom in) => 600px
-    // Level 1: ~3 images per row           => 200px
-    // Level 2: ~5 images per row           => 120px
-    // Level 3: ~9 images per row (max zoom out) => 66.67px
-    const zoomLevels = ["600px", "200px", "120px", "66.67px"];
+    // Level 0: ~1 image per row (max zoom in) => "300px"
+    // Level 1: ~3 images per row           => "200px"
+    // Level 2: ~5 images per row           => "120px"
+    // Level 3: ~9 images per row (max zoom out) => "66.67px"
+    const zoomLevels = ["300px", "200px", "120px", "66.67px"];
     // Start at maximum zoom out (level 3)
     let currentZoomLevel = zoomLevels.length - 1;
     
     function updateGridZoom() {
       document.documentElement.style.setProperty('--grid-item-min-size', zoomLevels[currentZoomLevel]);
       
-      // Toggle the "maxZoomOut" class on body at level 3
+      // Toggle the "maxZoomOut" class on body at level 3 (max zoom out)
       if (currentZoomLevel === zoomLevels.length - 1) {
         document.body.classList.add('maxZoomOut');
       } else {
         document.body.classList.remove('maxZoomOut');
       }
       
-      // Show/hide buttons accordingly
+      // Show/hide buttons accordingly:
+      // At max zoom out, hide the Zoom Out button;
+      // at max zoom in, hide the Zoom In button.
       zoomOutButton.style.display = (currentZoomLevel === zoomLevels.length - 1) ? "none" : "block";
       zoomInButton.style.display = (currentZoomLevel === 0) ? "none" : "block";
     }
