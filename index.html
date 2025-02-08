@@ -143,26 +143,24 @@
       display: none; /* Hide captions */
     }
 
-  .slides-container {
-    width: 300px;
-    display: flex;
-    gap: 5px; /* 5px gutter between images */
-  }
+    .slides-container {
+      width: 300px;
+      display: flex;
+      gap: 5px; /* 5px gutter between images */
+    }
 
-  .slides-container img {
-    /* Calculate each image's width: (300px - 3*5px) / 4 */
-    width: calc((300px - 15px) / 4);
-    height: auto; /* maintains aspect ratio */
-    display: block;
-  }
+    .slides-container img {
+      /* Calculate each image's width: (300px - 3*5px) / 4 */
+      width: calc((300px - 15px) / 4);
+      height: auto; /* maintains aspect ratio */
+      display: block;
+    }
 
-  .line-image {
-  width: 300px;
-  display: block;  /* ensures the image is treated as a block element */
-  margin: 0 auto;  /* centers the image horizontally if desired */
-}
-
-
+    .line-image {
+      width: 300px;
+      display: block;  /* ensures the image is treated as a block element */
+      margin: 0 auto;  /* centers the image horizontally if desired */
+    }
   </style>
 </head>
 <body>
@@ -170,11 +168,9 @@
     <h1 style="margin-bottom: 0.6rem;">Simulacrum Orbita</h1>
     <p style="font-size: 0.8rem; margin-top: 0.1rem; margin-bottom:0rem;"><i>Nikos Antonio Kourous Vázquez</i></p>
     <p style="font-size: 0.8rem"><i><a href="https://instagram.com/nikoskourous" target="_blank" rel="noopener noreferrer">@nikoskourous</a> </i></p>
-
   </header>
   <main>
-
-    <img src="nikos_simulacrum_closeup.jpg" alt "nikos_simulacrum_closeup" style="display: block; margin: 1em 0; width: 330px; height: auto;">
+    <img src="nikos_simulacrum_closeup.jpg" alt="nikos_simulacrum_closeup" style="display: block; margin: 1em 0; width: 330px; height: auto;">
     <p>
       <i>Simulacrum Orbita</i> is a never-ending feedback loop between two generative machine learning (AI) models: one generates images, while the other describes them. Like the game “<span id="telephone">telephone</span>”, a message is passed along between them, becoming slowly distorted over time.
     </p>
@@ -183,7 +179,6 @@
       The loop begins with a generated image – such as ‘a red car’. This newly created image is passed along to the machine learning program able to ‘see’ and describe images. Rather than accurately describing that image as a 'red car’, however, this model might describe it as ‘a red building’ instead, perhaps because it mistook the car windows as those of a building. This new description is then used as the prompt for the next image, and so on. In this example, the red building might be described as a red mailbox, and then a fire hydrant, and then perhaps, a red sunset.
     </p>
 
-    
     <div class="slides-container">
       <img src="slide one (1).png" alt="Slide 1">
       <img src="slide one (2).png" alt="Slide 2">
@@ -191,11 +186,9 @@
       <img src="slide one (4).png" alt="Slide 4">
     </div>
     
-    
     <p>
       Overtime, random deviations, either in the generated images or in their generated descriptions, transform the content, nature, and trajectory of the image sequence. Upon each subsequent update, each monitor displays, from left to right, a new image created from the generated description of the image before it. Sometimes, the imagery shifts rapidly between different objects, people, and places as they struggle to communicate and understand one another. Other times, the models find themselves lost in forest paths or city streets, or in fields of grass.
     </p>
-
 
     <div class="slides-container">
       <img src="slide two (1).png" alt="Slide 1">
@@ -231,20 +224,12 @@
     </div>
 
     <h2><i>Process </i></h2>
-
     <p>The two models are assembled in a python program -- first, the image generator model creates an image, this image is saved locally, and then passed to the image describer model, which generates a description of the image. The loop then restarts, using this generated image as the prompt for the next image.</p>
     <img src="code 7.jpg" alt="assemnlty" style="display: block; margin: 1em 0; width: 330px; height: auto;">
-
     <img src="code 6.jpg" alt="assemnlty" style="display: block; margin: 1em 0; width: 330px; height: auto;">
-
     <p> the images are displayed using pythons tkinter module. </p>
-
     <img src="code 2.jpg" alt="assemnlty" style="display: block; margin: 1em 0; width: 330px; height: auto;">
-
-
     <img src="code 5.jpg" alt="assemnlty" style="display: block; margin: 1em 0; width: 330px; height: auto;">
-
-
     <p> the monitor unit was cut out using a cnc machine, and assembled with screws (big thank you to Matty and the technicians at woodworking for guiding me through the process!) </p>
     <img src="const1.jpg" alt="assemnlty" style="display: block; margin: 1em 0; width: 330px; height: auto;">
     <img src="const3.jpg" alt="assemnlty" style="display: block; margin: 1em 0; width: 330px; height: auto;">
@@ -253,31 +238,22 @@
     <img src="assembly 1.jpg" alt="assemnlty" style="display: block; margin: 1em 0; width: 330px; height: auto;">
     <img src="assembly 2.jpg" alt="assemnlty" style="display: block; margin: 1em 0; width: 330px; height: auto;">
     <video src="video running.mp4" autoplay muted loop playsinline style="display: block; margin: 1em 0; width: 320px; height: auto;"></video>
-
-
-
-
-
-
-
-
   </main>
   
-
   <!-- Scroll To Top Button -->
   <button id="scrollToTop">Top</button>
-
+  
   <!-- Zoom Controls -->
   <div id="zoomControls">
     <button id="zoomIn">zoom in!</button>
     <button id="zoomOut">zoom out!</button>
   </div>
-
+  
   <script>
     // --- Popover functionality for "telephone" ---
     const telephone = document.getElementById('telephone');
     const popover = document.getElementById('popover');
-
+  
     telephone.addEventListener('click', (e) => {
       const rect = telephone.getBoundingClientRect();
       popover.style.top = (rect.bottom + window.scrollY) + 'px';
@@ -285,13 +261,13 @@
       popover.style.display = 'block';
       e.stopPropagation();
     });
-
+  
     document.addEventListener('click', (event) => {
       if (!popover.contains(event.target) && event.target !== telephone) {
         popover.style.display = 'none';
       }
     });
-
+  
     // --- Image Grid with Captions Visible by Default ---
     function createGridItem(imageData) {
       const gridItem = document.createElement('div');
@@ -333,7 +309,7 @@
         });
       })
       .catch(error => console.error('Error loading images:', error));
-
+  
     // --- Scroll Behavior for "Scroll to Top" Button ---
     const scrollToTopButton = document.getElementById('scrollToTop');
     const fixedThreshold = 200;
@@ -346,7 +322,7 @@
         behavior: 'smooth'
       });
     });
-
+  
     // --- Zoom Controls ---
     const zoomInButton = document.getElementById('zoomIn');
     const zoomOutButton = document.getElementById('zoomOut');
@@ -393,8 +369,20 @@
     
     // Initialize zoom level on page load
     updateGridZoom();
+  
+    // --- Hide Zoom Controls When Scrolling Past the Grid ---
+    const zoomControlsDiv = document.getElementById('zoomControls');
+    window.addEventListener('scroll', () => {
+      const gridRect = document.getElementById('imageGrid').getBoundingClientRect();
+      // If the bottom of the grid is above the viewport (i.e. scrolled past), hide zoom controls.
+      if (gridRect.bottom < 0) {
+        zoomControlsDiv.style.display = 'none';
+      } else {
+        zoomControlsDiv.style.display = 'flex';
+      }
+    });
   </script>
-
+  
   <footer>
     <p>&copy; 2025 Nikos Antonio Kourous-Vázquez</p>
     <p><a href="http://nikos.kourous.net" target="_blank" rel="noopener noreferrer">nikos.kourous.net</a></p>
